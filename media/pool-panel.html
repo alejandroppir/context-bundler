@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'nonce-{{NONCE}}'; script-src 'nonce-{{NONCE}}';" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style nonce="{{NONCE}}">
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--vscode-font-family);
+        font-size: var(--vscode-font-size);
+        color: var(--vscode-foreground);
+        background: transparent;
+      }
+
+      /* ── Botones Generate / Copy ── */
+      .actions {
+        display: flex;
+        gap: 6px;
+        padding: 8px;
+        border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border, transparent);
+      }
+
+      .btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 5px 8px;
+        border-radius: 3px;
+        border: none;
+        cursor: pointer;
+        font-size: var(--vscode-font-size);
+        font-family: var(--vscode-font-family);
+        transition: opacity 0.1s;
+      }
+      .btn:active {
+        opacity: 0.8;
+      }
+
+      .btn-primary {
+        background: var(--vscode-button-background);
+        color: var(--vscode-button-foreground);
+      }
+      .btn-primary:hover {
+        background: var(--vscode-button-hoverBackground);
+      }
+
+      .btn-secondary {
+        background: var(--vscode-button-secondaryBackground);
+        color: var(--vscode-button-secondaryForeground);
+      }
+      .btn-secondary:hover {
+        background: var(--vscode-button-secondaryHoverBackground);
+      }
+
+      /* ── Lista de ficheros ── */
+      .file-list {
+        list-style: none;
+        padding: 4px 0;
+      }
+
+      .file-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 8px 3px 6px;
+        cursor: default;
+        user-select: none;
+        border-radius: 3px;
+        margin: 0 4px;
+      }
+      .file-item:hover {
+        background: var(--vscode-list-hoverBackground);
+      }
+
+      .file-item input[type='checkbox'] {
+        flex-shrink: 0;
+        cursor: pointer;
+        accent-color: var(--vscode-focusBorder);
+        width: 13px;
+        height: 13px;
+      }
+
+      .file-icon {
+        flex-shrink: 0;
+        font-size: 12px;
+        opacity: 0.75;
+      }
+
+      .file-label {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .file-description {
+        font-size: 10px;
+        color: var(--vscode-descriptionForeground);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 120px;
+        flex-shrink: 0;
+      }
+
+      .file-remove {
+        flex-shrink: 0;
+        display: none;
+        align-items: center;
+        background: none;
+        border: none;
+        color: var(--vscode-icon-foreground);
+        cursor: pointer;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 12px;
+        line-height: 1;
+        opacity: 0.6;
+      }
+      .file-item:hover .file-remove {
+        display: flex;
+      }
+      .file-remove:hover {
+        opacity: 1;
+        background: var(--vscode-toolbar-hoverBackground);
+      }
+
+      /* ── Estado vacío ── */
+      .empty {
+        padding: 24px 16px;
+        color: var(--vscode-descriptionForeground);
+        font-size: 12px;
+        text-align: center;
+        line-height: 1.6;
+      }
+      .empty-icon {
+        font-size: 24px;
+        display: block;
+        margin-bottom: 8px;
+        opacity: 0.5;
+      }
+
+      /* ── Info del bundle ── */
+      .bundle-info {
+        padding: 8px;
+        margin: 4px 8px 8px;
+        border-radius: 4px;
+        background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.1));
+        border-left: 2px solid var(--vscode-focusBorder);
+        font-size: 11px;
+        color: var(--vscode-descriptionForeground);
+        display: none;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .bundle-info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .bundle-info strong {
+        color: var(--vscode-foreground);
+      }
+
+      .bundle-info a {
+        color: var(--vscode-textLink-foreground);
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .bundle-info a:hover {
+        text-decoration: underline;
+      }
+
+      .bundle-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        background: var(--vscode-badge-background);
+        color: var(--vscode-badge-foreground);
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Botones Generate / Copy -->
+    <div class="actions">
+      <button class="btn btn-primary" id="btn-generate" title="Generate bundle from selected files">
+        ⚡ Generate
+      </button>
+      <button class="btn btn-secondary" id="btn-copy" title="Copy bundle content to clipboard">
+        📋 Copy
+      </button>
+    </div>
+
+    <!-- Lista de ficheros -->
+    <ul class="file-list" id="file-list">
+      <li class="empty">
+        <span class="empty-icon">📂</span>
+        No files in pool.<br />Right-click files in the Explorer to add them.
+      </li>
+    </ul>
+
+    <!-- Info última generación -->
+    <div class="bundle-info" id="bundle-info"></div>
+
+    <script nonce="{{NONCE}}">
+      const vscode = acquireVsCodeApi();
+
+      const fileList = document.getElementById('file-list');
+      const bundleInfo = document.getElementById('bundle-info');
+      const btnGenerate = document.getElementById('btn-generate');
+      const btnCopy = document.getElementById('btn-copy');
+
+      let currentFiles = [];
+
+      // ── Botones ──────────────────────────────────────────────────────────────
+
+      btnGenerate.addEventListener('click', () => {
+        const selected = currentFiles
+          .filter((_, i) => {
+            const cb = document.getElementById('cb-' + i);
+            return cb && cb.checked;
+          })
+          .map((f) => f.fsPath);
+        vscode.postMessage({ command: 'generateBundle', selected });
+      });
+
+      btnCopy.addEventListener('click', () => {
+        vscode.postMessage({ command: 'copyBundle' });
+      });
+
+      // ── Mensajes desde la extensión ──────────────────────────────────────────
+
+      window.addEventListener('message', ({ data: msg }) => {
+        if (msg.command === 'update') {
+          renderFiles(msg.files);
+          renderBundleInfo(msg.bundleInfo);
+        }
+      });
+
+      // ── Render ficheros ───────────────────────────────────────────────────────
+
+      function renderFiles(files) {
+        currentFiles = files;
+        fileList.innerHTML = '';
+
+        if (files.length === 0) {
+          fileList.innerHTML = `
+            <li class="empty">
+              <span class="empty-icon">📂</span>
+              No files in pool.<br>Right-click files in the Explorer to add them.
+            </li>`;
+          return;
+        }
+
+        files.forEach((file, i) => {
+          const li = document.createElement('li');
+          li.className = 'file-item';
+          li.title = file.description;
+
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.id = 'cb-' + i;
+          cb.checked = file.checked;
+          cb.addEventListener('change', () => {
+            vscode.postMessage({
+              command: 'toggleCheck',
+              fsPath: file.fsPath,
+              checked: cb.checked,
+            });
+          });
+
+          const icon = document.createElement('span');
+          icon.className = 'file-icon';
+          icon.textContent = getFileIcon(file.label);
+
+          const label = document.createElement('span');
+          label.className = 'file-label';
+          label.textContent = file.label;
+
+          const desc = document.createElement('span');
+          desc.className = 'file-description';
+          desc.title = file.description;
+          desc.textContent = file.description.replace(/\\/g, '/').split('/').slice(-2, -1)[0] || '';
+
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'file-remove';
+          removeBtn.title = 'Remove from pool';
+          removeBtn.textContent = '✕';
+          removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            vscode.postMessage({ command: 'removeFile', fsPath: file.fsPath });
+          });
+
+          li.append(cb, icon, label, desc, removeBtn);
+          fileList.appendChild(li);
+        });
+      }
+
+      // ── Render bundle info ────────────────────────────────────────────────────
+
+      function renderBundleInfo(info) {
+        if (!info || !info.generatedAt) {
+          bundleInfo.style.display = 'none';
+          bundleInfo.innerHTML = '';
+          return;
+        }
+
+        const date = new Date(info.generatedAt);
+        const formatted = isNaN(date.getTime()) ? info.generatedAt : date.toLocaleString();
+
+        bundleInfo.style.display = 'flex';
+        bundleInfo.innerHTML = `
+          <div class="bundle-info-row">
+            <span>Last generated: <strong>${formatted}</strong></span>
+            <span class="bundle-badge">📄 ${info.fileCount}</span>
+          </div>
+          ${info.exists ? '<div><a id="link-open-bundle">Open bundle file ↗</a></div>' : ''}`;
+
+        const link = document.getElementById('link-open-bundle');
+        if (link) {
+          link.addEventListener('click', () => vscode.postMessage({ command: 'openBundle' }));
+        }
+      }
+
+      // ── Icono por extensión ───────────────────────────────────────────────────
+
+      function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const icons = {
+          ts: '🔷',
+          js: '🟨',
+          html: '🌐',
+          css: '🎨',
+          scss: '🎨',
+          sass: '🎨',
+          json: '📋',
+          md: '📝',
+          txt: '📄',
+          svg: '🖼️',
+          png: '🖼️',
+          jpg: '🖼️',
+          jpeg: '🖼️',
+          gif: '🖼️',
+          xml: '📄',
+          yml: '⚙️',
+          yaml: '⚙️',
+          env: '⚙️',
+          sh: '⚙️',
+          ps1: '⚙️',
+          gitignore: '🔧',
+          java: '☕',
+          py: '🐍',
+          sql: '🗄️',
+        };
+        return icons[ext] || '📄';
+      }
+
+      // ── Init ──────────────────────────────────────────────────────────────────
+
+      vscode.postMessage({ command: 'ready' });
+    </script>
+  </body>
+</html>

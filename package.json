@@ -1,9 +1,13 @@
 {
+  "version": "0.0.2",
   "name": "context-bundler",
   "displayName": "Context Bundler",
   "description": "Bundle the content of multiple files into the clipboard, ready to paste into ChatGPT, Gemini, Claude or any other LLM.",
+  "icon": "media/logo.png",
   "publisher": "alejandroppir",
-  "version": "0.0.1",
+  "repository": {
+    "url": "https://github.com/alejandroppir/context-bundler"
+  },
   "engines": {
     "vscode": "^1.125.0"
   },
@@ -13,12 +17,138 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "context-bundler-sidebar",
+          "title": "Context Bundler",
+          "icon": "media/logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "contextBundlerPool",
+          "name": "Context Bundler Pool",
+          "contextualTitle": "Context Bundler",
+          "icon": "media/icon.svg"
+        }
+      ],
+      "context-bundler-sidebar": [
+        {
+          "type": "webview",
+          "id": "contextBundlerPoolActivity",
+          "name": "Context Bundler Pool",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "context-bundler.helloWorld",
-        "title": "Hello World"
+        "command": "context-bundler.addActiveFile",
+        "title": "Context Bundler: Add Active Tab File to Pool"
+      },
+      {
+        "command": "context-bundler.removeActiveFile",
+        "title": "Context Bundler: Remove Active Tab File from Pool"
+      },
+      {
+        "command": "context-bundler.addFile",
+        "title": "Context Bundler: Add File to Pool"
+      },
+      {
+        "command": "context-bundler.removeFile",
+        "title": "Context Bundler: Remove File from Pool"
+      },
+      {
+        "command": "context-bundler.addSelected",
+        "title": "Context Bundler: Add All to Pool"
+      },
+      {
+        "command": "context-bundler.removeSelected",
+        "title": "Context Bundler: Remove All from Pool"
+      },
+      {
+        "command": "context-bundler.addAllOpenTabs",
+        "title": "Context Bundler: Add All Open Tabs to Pool"
+      },
+      {
+        "command": "context-bundler.removeAllOpenTabs",
+        "title": "Context Bundler: Remove All Open Tabs from Pool"
+      },
+      {
+        "command": "context-bundler.refreshPool",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "context-bundler.selectAll",
+        "title": "Select All",
+        "icon": "$(expand-all)"
+      },
+      {
+        "command": "context-bundler.deselectAll",
+        "title": "Deselect All",
+        "icon": "$(collapse-all)"
+      },
+      {
+        "command": "context-bundler.clearPool",
+        "title": "Clear Pool",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "context-bundler.debugListPool",
+        "title": "Context Bundler: Debug - List Pool"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "context-bundler.addFile",
+          "when": "explorerResourceIsFolder == false",
+          "group": "context-bundler@1"
+        },
+        {
+          "command": "context-bundler.removeFile",
+          "when": "explorerResourceIsFolder == false",
+          "group": "context-bundler@2"
+        },
+        {
+          "command": "context-bundler.addSelected",
+          "when": "listMultiSelection == true || explorerResourceIsFolder == true",
+          "group": "context-bundler@3"
+        },
+        {
+          "command": "context-bundler.removeSelected",
+          "when": "listMultiSelection == true || explorerResourceIsFolder == true",
+          "group": "context-bundler@4"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "context-bundler.refreshPool",
+          "when": "view == contextBundlerPool || view == contextBundlerPoolActivity",
+          "group": "navigation@1"
+        },
+        {
+          "command": "context-bundler.selectAll",
+          "when": "view == contextBundlerPool || view == contextBundlerPoolActivity",
+          "group": "navigation@2"
+        },
+        {
+          "command": "context-bundler.deselectAll",
+          "when": "view == contextBundlerPool || view == contextBundlerPoolActivity",
+          "group": "navigation@3"
+        },
+        {
+          "command": "context-bundler.clearPool",
+          "when": "view == contextBundlerPool || view == contextBundlerPoolActivity",
+          "group": "navigation@4"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -29,14 +159,16 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.125.0",
+    "@eslint/js": "^10.0.1",
+    "@html-eslint/eslint-plugin": "^0.63.0",
     "@types/mocha": "^10.0.10",
-    "@types/node": "24.x",
-    "typescript-eslint": "^8.61.1",
+    "@types/node": "^24.13.2",
+    "@types/vscode": "^1.125.0",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.0.0",
     "eslint": "^10.5.0",
     "typescript": "^6.0.3",
-    "@vscode/test-cli": "^0.0.15",
-    "@vscode/test-electron": "^3.0.0"
+    "typescript-eslint": "^8.61.1"
   },
   "overrides": {
     "diff": "^8.0.4",

@@ -1,71 +1,87 @@
-# context-bundler README
+# Context Bundler
 
-This is the README for your extension "context-bundler". After writing up a brief description, we recommend including the following sections.
+Bundle the content of multiple files into a single context file, ready to paste into ChatGPT, Gemini, Claude or any other LLM — without opening each file manually.
+
+## Why?
+
+When working with an LLM, you often need to provide context from several files. The usual workflow is painful: open file → Ctrl+A → Ctrl+C → switch to browser → Ctrl+V → repeat for every file.
+
+Context Bundler lets you build a pool of files, generate a single concatenated bundle, and copy it to the clipboard in one click.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Context Bundler Pool panel
 
-For example if there is an image subfolder under your extension project workspace:
+A dedicated panel in the Explorer sidebar showing your current file pool:
 
-\!\[feature X\]\(images/feature-x.png\)
+- **Checkboxes** to select which files to include in the next bundle (all checked by default).
+- **✕ button** (on hover) to remove individual files from the pool.
+- **⚡ Generate** — concatenates all checked files into a bundle file, with clear start/end markers for each file.
+- **📋 Copy** — copies the last generated bundle to the clipboard.
+- **Last generated** timestamp and a link to open the bundle file directly in the editor.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Panel toolbar icons
+
+| Icon                      | Action                          |
+| ------------------------- | ------------------------------- |
+| $(refresh) Refresh        | Refreshes the panel             |
+| $(check-all) Select All   | Checks all files in the pool    |
+| $(close-all) Deselect All | Unchecks all files in the pool  |
+| $(trash) Clear Pool       | Removes all files from the pool |
+
+### Explorer context menu
+
+Right-click any file or folder in the Explorer:
+
+**Single file:**
+
+- `Context Bundler: SINGLE - Add to Pool`
+- `Context Bundler: SINGLE - Remove from Pool`
+
+**Multiple files selected:**
+
+- `Context Bundler: MULTI - Toggle in Pool`
+- `Context Bundler: MULTI - Add All to Pool`
+- `Context Bundler: MULTI - Remove All from Pool`
+
+**Folder (single or multi):**
+
+- `Context Bundler: MULTI - Add All to Pool` — expands the folder recursively and adds all files found.
+- `Context Bundler: MULTI - Remove All from Pool`
+
+When a selection contains both files and folders, a confirmation popup asks whether to expand folders recursively or process only the loose files.
+
+### Command Palette
+
+All commands are available via `Ctrl+Shift+P`:
+
+- `Context Bundler: SINGLE - Add Active File to Pool` — adds the file open in the current editor tab.
+- `Context Bundler: SINGLE - Remove Active File from Pool`
+- `Context Bundler: MULTI - Add All Open Tabs to Pool`
+- `Context Bundler: MULTI - Remove All Open Tabs from Pool`
+
+### Bundle format
+
+Each file in the bundle is wrapped with clear markers using its relative path:
+
+```
+// ========== START: src/app/my.component.ts ==========
+... file content ...
+// ========== END: src/app/my.component.ts ==========
+```
+
+The bundle is saved to your system's temp folder (`os.tmpdir()/context-bundler/bundle.txt`) and is not added to your workspace.
+
+### Persistence
+
+The file pool is saved per workspace. It survives closing and reopening VS Code as long as you work in the same workspace folder.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
+No external dependencies.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release.

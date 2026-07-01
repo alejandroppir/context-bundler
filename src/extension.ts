@@ -1,25 +1,28 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import { ExtensionContext, window } from 'vscode';
+import { registerCommands } from './commands';
+import { FilePool } from './pool';
+import { FilePoolWebviewProvider } from './pool-webview-provider';
+import { initLogger, logger } from './logger';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "context-bundler" is now active!');
+export function activate(context: ExtensionContext) {
+  context.subscriptions.push(initLogger());
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand('context-bundler.helloWorld', () => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage('Hello World from Context Bundler!');
-  });
+  logger.info('Context Bundler is now active!');
 
-  context.subscriptions.push(disposable);
+  const pool = new FilePool(context);
+
+  const webviewProvider = new FilePoolWebviewProvider(pool, context.extensionUri);
+
+  context.subscriptions.push(
+    window.registerWebviewViewProvider(FilePoolWebviewProvider.viewType, webviewProvider, {
+      webviewOptions: { retainContextWhenHidden: true },
+    }),
+    window.registerWebviewViewProvider(FilePoolWebviewProvider.viewTypeActivity, webviewProvider, {
+      webviewOptions: { retainContextWhenHidden: true },
+    })
+  );
+
+  registerCommands(context, pool, webviewProvider);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() {}
