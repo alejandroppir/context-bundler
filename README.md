@@ -12,22 +12,22 @@ Context Bundler lets you build a pool of files, generate a single concatenated b
 
 ### Context Bundler Pool panel
 
-A dedicated panel in the Explorer sidebar showing your current file pool:
+A dedicated panel in the Explorer sidebar (and Activity Bar) showing your current file pool:
 
 - **Checkboxes** to select which files to include in the next bundle (all checked by default).
 - **✕ button** (on hover) to remove individual files from the pool.
-- **⚡ Generate** — concatenates all checked files into a bundle file, with clear start/end markers for each file.
+- **⚡ Generate** — concatenates all checked files into a bundle file, with clear start/end markers per file.
 - **📋 Copy** — copies the last generated bundle to the clipboard.
 - **Last generated** timestamp and a link to open the bundle file directly in the editor.
 
 ### Panel toolbar icons
 
-| Icon                      | Action                          |
-| ------------------------- | ------------------------------- |
-| $(refresh) Refresh        | Refreshes the panel             |
-| $(check-all) Select All   | Checks all files in the pool    |
-| $(close-all) Deselect All | Unchecks all files in the pool  |
-| $(trash) Clear Pool       | Removes all files from the pool |
+| Icon           | Action                          |
+| -------------- | ------------------------------- |
+| 🔄 Refresh     | Refreshes the panel             |
+| ✅ Select All  | Checks all files in the pool    |
+| ✖ Deselect All | Unchecks all files in the pool  |
+| 🗑 Clear Pool  | Removes all files from the pool |
 
 ### Explorer context menu
 
@@ -35,19 +35,13 @@ Right-click any file or folder in the Explorer:
 
 **Single file:**
 
-- `Context Bundler: SINGLE - Add to Pool`
-- `Context Bundler: SINGLE - Remove from Pool`
+- `Context Bundler: Add File to Pool`
+- `Context Bundler: Remove File from Pool`
 
-**Multiple files selected:**
+**Multiple files selected or folder:**
 
-- `Context Bundler: MULTI - Toggle in Pool`
-- `Context Bundler: MULTI - Add All to Pool`
-- `Context Bundler: MULTI - Remove All from Pool`
-
-**Folder (single or multi):**
-
-- `Context Bundler: MULTI - Add All to Pool` — expands the folder recursively and adds all files found.
-- `Context Bundler: MULTI - Remove All from Pool`
+- `Context Bundler: Add All to Pool`
+- `Context Bundler: Remove All from Pool`
 
 When a selection contains both files and folders, a confirmation popup asks whether to expand folders recursively or process only the loose files.
 
@@ -55,10 +49,10 @@ When a selection contains both files and folders, a confirmation popup asks whet
 
 All commands are available via `Ctrl+Shift+P`:
 
-- `Context Bundler: SINGLE - Add Active File to Pool` — adds the file open in the current editor tab.
-- `Context Bundler: SINGLE - Remove Active File from Pool`
-- `Context Bundler: MULTI - Add All Open Tabs to Pool`
-- `Context Bundler: MULTI - Remove All Open Tabs from Pool`
+- `Context Bundler: Add Active Tab File to Pool` — adds the file open in the current editor tab.
+- `Context Bundler: Remove Active Tab File from Pool`
+- `Context Bundler: Add All Open Tabs to Pool`
+- `Context Bundler: Remove All Open Tabs from Pool`
 
 ### Bundle format
 
@@ -82,6 +76,6 @@ No external dependencies.
 
 ## Release Notes
 
-### 0.0.1
+### 1.0.0
 
-Initial release.
+First stable release. See [CHANGELOG](CHANGELOG.md) for full details.

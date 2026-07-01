@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "1.0.0",
   "name": "context-bundler",
   "displayName": "Context Bundler",
   "description": "Bundle the content of multiple files into the clipboard, ready to paste into ChatGPT, Gemini, Claude or any other LLM.",
